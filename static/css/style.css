@@ -1,0 +1,136 @@
+:root {
+  --bg: #0f1013;
+  --card-bg: #1a1c22;
+  --accent: #4e57f7;
+  --text: #e4e6eb;
+  --subtext: #9a9ea8;
+  --radius: 12px;
+  --transition: 0.3s;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.app-wrapper {
+  width: 100%;
+  max-width: 800px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  display: none;
+}
+
+.cards-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding-bottom: 20px;
+  width: 100%;
+}
+
+/* Карточка */
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  transition: transform var(--transition), box-shadow var(--transition);
+  animation: fade-in var(--transition) ease-out;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.info label {
+  font-weight: 600;
+  color: var(--subtext);
+  font-size: 0.9rem;
+}
+.info span {
+  font-size: 1.1rem;
+  color: var(--text);
+  display: block;
+  max-width: 140px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  transition: color var(--transition), transform var(--transition);
+}
+.copy-btn .material-icons {
+  font-size: 1.2em;
+}
+.copy-btn:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* Кнопка генерации */
+#generate-btn {
+  margin-top: 24px;
+  padding: 12px 24px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(78,87,247,0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+#generate-btn .material-icons {
+  font-size: 1.2em;
+}
+#generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(78,87,247,0.5);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.pulse {
+  animation: pulse 0.4s ease-out;
+}
+
+@media (max-width: 600px) {
+  .cards-wrapper {
+    grid-template-columns: 1fr;
+  }
+}

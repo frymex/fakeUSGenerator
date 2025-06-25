@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+  <div id="result" class="cards-wrapper">
+    <div class="card">
+      <div class="info">
+        <label>First Name</label>
+        <span id="first_name">{{ first_name }}</span>
+      </div>
+      <button class="copy-btn" data-target="first_name">
+        <span class="material-icons">content_copy</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="info">
+        <label>Last Name</label>
+        <span id="last_name">{{ last_name }}</span>
+      </div>
+      <button class="copy-btn" data-target="last_name">
+        <span class="material-icons">content_copy</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="info">
+        <label>Gender</label>
+        <span id="gender">{{ gender }}</span>
+      </div>
+      <button class="copy-btn" data-target="gender">
+        <span class="material-icons">content_copy</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="info">
+        <label>Date of Birth</label>
+        <span id="dob">{{ dob }}</span>
+      </div>
+      <button class="copy-btn" data-target="dob">
+        <span class="material-icons">content_copy</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="info">
+        <label>Email</label>
+        <span id="email">{{ email }}</span>
+      </div>
+      <button class="copy-btn" data-target="email">
+        <span class="material-icons">content_copy</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="info">
+        <label>Password</label>
+        <span id="password">{{ password }}</span>
+      </div>
+      <button class="copy-btn" data-target="password">
+        <span class="material-icons">content_copy</span>
+      </button>
+    </div>
+  </div>
+
+  <button id="generate-btn">
+    <span class="material-icons">autorenew</span></button>
+{% endblock %}
