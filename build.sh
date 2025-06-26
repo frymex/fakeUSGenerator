@@ -1,49 +1,60 @@
 #!/bin/bash
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-CYAN='\033[0;36m'
-NC='\033[0m' # no color
-
 # Check domain argument
 if [ -z "$1" ]; then
-  echo -e "${RED}❌ Usage: ./build.sh <your-domain.com>${NC}"
+  echo "Usage: ./build.sh <your-domain.com>"
   exit 1
 fi
 
 DOMAIN="$1"
-echo -e "${CYAN}🔧 Configuring nginx with domain: $DOMAIN${NC}"
+echo "Configuring nginx with domain: $DOMAIN"
 
 # Check template exists
 if [ ! -f nginx/default.conf.template ]; then
-  echo -e "${RED}❌ Template nginx/default.conf.template not found.${NC}"
+  echo "ERROR: Template nginx/default.conf.template not found."
   exit 1
 fi
 
 # Generate nginx config
 sed "s/{{DOMAIN_NAME}}/$DOMAIN/g" nginx/default.conf.template > nginx/default.conf
-echo -e "${GREEN}✔ NGINX config generated → nginx/default.conf${NC}"
+echo "✔ NGINX config generated → nginx/default.conf"
 
-# Check for docker
+# Check for Docker
 if ! command -v docker &> /dev/null; then
-  echo -e "${RED}❌ Docker is not installed. Please install Docker first.${NC}"
-  exit 1
+  echo "Docker is not installed."
+
+  read -p "Install latest Docker now? (y/N): " install_docker
+  if [[ "$install_docker" =~ ^[Yy]$ ]]; then
+    curl -fsSL https://get.docker.com | sh
+  else
+    echo "Aborting: Docker is required."
+    exit 1
+  fi
 fi
 
-# Check for docker-compose (or suggest alternative)
+# Check for docker-compose
 if ! command -v docker-compose &> /dev/null; then
-  echo -e "${RED}❌ docker-compose not found.${NC}"
-  echo -e "${CYAN}👉 Try installing it with:${NC} ${GREEN}apt install docker-compose${NC}"
-  exit 1
+  echo "docker-compose is not installed."
+
+  read -p "Install docker-compose (v2 plugin)? (y/N): " install_compose
+  if [[ "$install_compose" =~ ^[Yy]$ ]]; then
+    DOCKER_COMPOSE_URL="https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
+    mkdir -p ~/.docker/cli-plugins
+    curl -SL $DOCKER_COMPOSE_URL -o ~/.docker/cli-plugins/docker-compose
+    chmod +x ~/.docker/cli-plugins/docker-compose
+    echo 'export PATH="$HOME/.docker/cli-plugins:$PATH"' >> ~/.bashrc
+    export PATH="$HOME/.docker/cli-plugins:$PATH"
+  else
+    echo "Aborting: docker-compose is required."
+    exit 1
+  fi
 fi
 
 # Build and run
-echo -e "${CYAN}🐳 Building Docker image...${NC}"
-docker-compose build || { echo -e "${RED}❌ Build failed${NC}"; exit 1; }
+echo "Building Docker image..."
+docker-compose build || { echo "❌ Build failed"; exit 1; }
 
-echo -e "${CYAN}🚀 Starting containers...${NC}"
-docker-compose up -d || { echo -e "${RED}❌ Failed to start containers${NC}"; exit 1; }
+echo "Starting containers..."
+docker-compose up -d || { echo "❌ Failed to start containers"; exit 1; }
 
-# Success
-echo -e "${GREEN}✅ Deployed successfully at → http://$DOMAIN${NC}"
+echo "✅ Deployed successfully at → http://$DOMAIN"
