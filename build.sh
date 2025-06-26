@@ -1,60 +1,71 @@
 #!/bin/bash
 
-# Check domain argument
+# --- FUNCTIONS ---
+
+# Install Docker CE (official way)
+install_docker() {
+  echo "Installing Docker..."
+  sudo apt-get update
+  sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+  sudo install -m 0755 -d /etc/apt/keyrings
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+}
+
+# --- MAIN ---
+
+# 1. Check domain argument
 if [ -z "$1" ]; then
   echo "Usage: ./build.sh <your-domain.com>"
   exit 1
 fi
 
 DOMAIN="$1"
-echo "Configuring nginx with domain: $DOMAIN"
+echo "🔧 Configuring for domain: $DOMAIN"
 
-# Check template exists
+# 2. Check template exists
 if [ ! -f nginx/default.conf.template ]; then
-  echo "ERROR: Template nginx/default.conf.template not found."
+  echo "ERROR: nginx/default.conf.template not found."
   exit 1
 fi
 
-# Generate nginx config
+# 3. Generate NGINX config
 sed "s/{{DOMAIN_NAME}}/$DOMAIN/g" nginx/default.conf.template > nginx/default.conf
-echo "✔ NGINX config generated → nginx/default.conf"
+echo "✔ NGINX config generated at nginx/default.conf"
 
-# Check for Docker
+# 4. Check Docker
 if ! command -v docker &> /dev/null; then
   echo "Docker is not installed."
-
-  read -p "Install latest Docker now? (y/N): " install_docker
-  if [[ "$install_docker" =~ ^[Yy]$ ]]; then
-    curl -fsSL https://get.docker.com | sh
+  read -p "Install Docker now using the official Docker installer? (y/N): " confirm
+  if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    install_docker
   else
     echo "Aborting: Docker is required."
     exit 1
   fi
 fi
 
-# Check for docker-compose
-if ! command -v docker-compose &> /dev/null; then
-  echo "docker-compose is not installed."
-
-  read -p "Install docker-compose (v2 plugin)? (y/N): " install_compose
-  if [[ "$install_compose" =~ ^[Yy]$ ]]; then
-    DOCKER_COMPOSE_URL="https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
-    mkdir -p ~/.docker/cli-plugins
-    curl -SL $DOCKER_COMPOSE_URL -o ~/.docker/cli-plugins/docker-compose
-    chmod +x ~/.docker/cli-plugins/docker-compose
-    echo 'export PATH="$HOME/.docker/cli-plugins:$PATH"' >> ~/.bashrc
-    export PATH="$HOME/.docker/cli-plugins:$PATH"
-  else
-    echo "Aborting: docker-compose is required."
-    exit 1
-  fi
+# 5. Check Docker Compose plugin
+if ! docker compose version &> /dev/null; then
+  echo "Docker Compose plugin not found (docker compose)."
+  echo "You may need to log out and log in again, or add ~/.docker/cli-plugins to PATH."
+  exit 1
 fi
 
-# Build and run
-echo "Building Docker image..."
-docker-compose build || { echo "❌ Build failed"; exit 1; }
+# 6. Build and run
+echo "🐳 Building Docker image..."
+docker compose build || { echo "❌ Build failed"; exit 1; }
 
-echo "Starting containers..."
-docker-compose up -d || { echo "❌ Failed to start containers"; exit 1; }
+echo "🚀 Starting containers..."
+docker compose up -d || { echo "❌ Failed to start containers"; exit 1; }
 
-echo "✅ Deployed successfully at → http://$DOMAIN"
+echo "✅ Deployed successfully at: http://$DOMAIN"
