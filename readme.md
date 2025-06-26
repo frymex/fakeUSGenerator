@@ -7,12 +7,12 @@ Perfect for testing, prototyping, or when you just need a fake Jeffrey 👤
 
 ## ✨ Features
 
-- ✅ U.S. Realistic Names (via Faker)
+- ✅ Realistic U.S. Names (via Faker)
 - 🔢 Gender, DOB, Email & Secure Password
-- 📬 Gmail-style Email Generation
-- 🔒 16+ character password with symbols, numbers, and casing
-- 🌑 Modern responsive dark UI
-- 📋 One-click Copy for every field
+- 📬 Gmail-style email generation
+- 🔒 16+ character strong password
+- 🌑 Responsive dark UI
+- 📋 One-click copy buttons
 
 ---
 
@@ -22,7 +22,7 @@ Perfect for testing, prototyping, or when you just need a fake Jeffrey 👤
 - Django 4.2+
 - Faker
 
-Install with:
+Install:
 
 ```bash
 pip install -r requirements.txt
@@ -30,44 +30,46 @@ pip install -r requirements.txt
 
 ---
 
-## 🚀 Local Setup
-
-1. **Clone the repo**
+## 🚀 Local Development
 
 ```bash
-git clone https://github.com/frymex/fakeUSGenerator.git fake-person-generator
-cd fake-person-generator
-```
+git clone https://github.com/frymex/fakeUSGenerator.git
+cd fakeUSGenerator
 
-2. **Create virtual environment**
-
-```bash
 python -m venv .venv
-source .venv/bin/activate   # Linux/macOS
-.venv\Scripts\activate      # Windows
-```
+source .venv/bin/activate
 
-3. **Install dependencies**
-
-```bash
 pip install -r requirements.txt
-```
-
-4. **Run the server**
-
-```bash
+python manage.py collectstatic --noinput
 python manage.py runserver
 ```
 
-Now visit [http://127.0.0.1:8000](http://127.0.0.1:8000) 🚪
+Now visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ---
 
+## 🐳 Run with Docker
 
-## 🛠 Customize
+```bash
+./build.sh faker.cazqev.pro
+```
 
-- Change colors/fonts in `static/css/style.css`
-- Adjust password rules in `generator/utils.py`
-- Localize name generation by switching Faker locale
+This will:
 
+- Replace domain in nginx config
+- Build & start Docker containers
+- Serve app at `http://faker.cazqev.pro`
 
+> Requires `docker` and `docker-compose` installed.
+
+---
+
+## 🎨 Customize
+
+- Change styles in `static/css/style.css`
+- Modify password logic in `generator/utils.py`
+- Update email rules or locales in `Faker`
+
+---
+
+Enjoy building fake identities responsibly 😄
